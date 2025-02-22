@@ -1,5 +1,8 @@
 import * as vscode from "vscode";
 import { getNonce } from "../utilities/getNonce";
+import { getAllSourceFilesWithCode } from '../helpers/getAllSourceFiles';
+import { uploadToVectorDB } from '../helpers/uploadToVectorDB';
+import { getEntryPoints } from '../helpers/getEntryPoints';
 
 export class SidebarPanel implements vscode.WebviewViewProvider {
   public static readonly viewType = "modulens-sidebarview";
@@ -24,15 +27,39 @@ export class SidebarPanel implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
       if (data.command === 'fetchRoutes') {
-        webviewView.webview.postMessage({
-          command: 'routesData',
-          data: [
-            { id: 1, name: 'Route 1' },
-            { id: 2, name: 'Route 2' },
-            { id: 3, name: 'Route 3' },
+        const workspaceFolders = vscode.workspace.workspaceFolders;
+        
+        if (!workspaceFolders) {
+          webviewView.webview.postMessage({
+        command: 'routesData',
+        data: [],
+        Status: 'No workspace found'
+          });
+          return;
+        }
 
-          ],
-        });
+        try {
+          // Get workspace root path
+          const rootPath = workspaceFolders[0].uri.fsPath;
+          const files = await getAllSourceFilesWithCode(rootPath);
+          console.log('Files:', files);
+          await uploadToVectorDB(files);
+          const entryPoints = await getEntryPoints();
+
+          webviewView.webview.postMessage({
+        command: 'routesData',
+        data: entryPoints.map((entry, index) => ({
+          id: index + 1,
+          name: entry
+        }))
+          });
+        } catch (error) {
+          console.error('Error processing workspace:', error);
+          webviewView.webview.postMessage({
+        command: 'routesData',
+        data: [],
+          });
+        }
       }
       if (data.command === 'showFlow') {
         vscode.commands.executeCommand('modulens.showFlow', data.routeName);
