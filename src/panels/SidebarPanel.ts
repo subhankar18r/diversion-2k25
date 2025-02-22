@@ -24,7 +24,14 @@ export class SidebarPanel implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
       if (data.command === 'fetchRoutes') {
-      await vscode.commands.executeCommand('modulens.showFlow');
+        webviewView.webview.postMessage({
+          command: 'routesData',
+          data: [
+            { id: 1, name: 'Route 1' },
+            { id: 2, name: 'Route 2' },
+            { id: 3, name: 'Route 3' },
+          ],
+        });
       }
       console.log("Received message:", data);
     });
