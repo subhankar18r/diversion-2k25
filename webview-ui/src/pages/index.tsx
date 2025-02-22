@@ -1,21 +1,27 @@
+import { useState, useEffect } from "react";
 import { vscode } from "../utilities/vscode";
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-import "./App.css";
 
-function App() {
-  function handleHowdyClick() {
-    vscode.postMessage({
-      command: "hello",
-      text: "Hey there partner! 🤠",
-    });
-  }
+function Routes() {
+  const [routeName, setRouteName] = useState<string>("");
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      const message = event.data;
+      if (message.command === "setRouteName") {
+        setRouteName(message.routeName);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
 
   return (
-    <main>
-      <h1>Hello World!</h1>
-      <VSCodeButton onClick={handleHowdyClick}>Howdy!</VSCodeButton>
-    </main>
+    <div>
+      <h1>Route Flow: {routeName}</h1>
+      {/* Add your route flow visualization here */}
+    </div>
   );
 }
 
-export default App;
+export default Routes;

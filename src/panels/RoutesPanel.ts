@@ -23,7 +23,7 @@ export class RoutesPanel {
    * @param panel A reference to the webview panel
    * @param extensionUri The URI of the directory containing the extension
    */
-  private constructor(panel: WebviewPanel, extensionUri: Uri) {
+  private constructor(panel: WebviewPanel, extensionUri: Uri, routeName: string) {
     this._panel = panel;
 
     // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
@@ -35,6 +35,12 @@ export class RoutesPanel {
 
     // Set an event listener to listen for messages passed from the webview context
     this._setWebviewMessageListener(this._panel.webview);
+
+    // Send the route name to the webview
+    this._panel.webview.postMessage({
+      command: 'setRouteName',
+      routeName: routeName
+    });
   }
 
   /**
@@ -43,17 +49,22 @@ export class RoutesPanel {
    *
    * @param extensionUri The URI of the directory containing the extension.
    */
-  public static render(extensionUri: Uri) {
+  public static render(extensionUri: Uri, routeName: string) {
     if (RoutesPanel.currentPanel) {
       // If the webview panel already exists reveal it
       RoutesPanel.currentPanel._panel.reveal(ViewColumn.One);
+      // Update the route name in the existing panel
+      RoutesPanel.currentPanel._panel.webview.postMessage({
+        command: 'setRouteName',
+        routeName: routeName
+      });
     } else {
       // If a webview panel does not already exist create and show a new one
       const panel = window.createWebviewPanel(
         // Panel view type
         "showFlow",
         // Panel title
-        "Show Flow",
+        `Flow: ${routeName}`, // Update panel title with route name
         // The editor column the panel should be displayed in
         ViewColumn.One,
         // Extra panel configurations
@@ -65,7 +76,7 @@ export class RoutesPanel {
         }
       );
 
-      RoutesPanel.currentPanel = new RoutesPanel(panel, extensionUri);
+      RoutesPanel.currentPanel = new RoutesPanel(panel, extensionUri, routeName);
     }
   }
 

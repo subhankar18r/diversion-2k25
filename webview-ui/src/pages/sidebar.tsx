@@ -27,13 +27,23 @@ function Sidebar() {
     vscode.postMessage({ command: "fetchRoutes" });
   };
 
+  const handleShowFlow = (routeName: string) => {
+    vscode.postMessage({
+      command: "showFlow",
+      routeName: routeName,
+    });
+  };
+
   return (
     <main>
       <VSCodeButton onClick={fetchRoutes}>Fetch Routes</VSCodeButton>
       {routesData && (
         <div>
           {routesData.map((route: any) => (
-            <div key={route.id}>
+            <div
+              key={route.id}
+              onClick={() => handleShowFlow(route.name)}
+              style={{ cursor: "pointer" }}>
               <h3>{route.name}</h3>
             </div>
           ))}

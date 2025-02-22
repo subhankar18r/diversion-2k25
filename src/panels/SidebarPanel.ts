@@ -30,10 +30,13 @@ export class SidebarPanel implements vscode.WebviewViewProvider {
             { id: 1, name: 'Route 1' },
             { id: 2, name: 'Route 2' },
             { id: 3, name: 'Route 3' },
+
           ],
         });
       }
-      console.log("Received message:", data);
+      if (data.command === 'showFlow') {
+        vscode.commands.executeCommand('modulens.showFlow', data.routeName);
+      }
     });
   }
 
