@@ -12,8 +12,9 @@ function Sidebar() {
 
   return (
     <main>
-      <h1>Hello World!</h1>
-      {/* <VSCodeButton onClick={handleHowdyClick}>Howdy!</VSCodeButton> */}
+      <VSCodeButton onClick={() => vscode.postMessage({ command: "fetchRoutes" })}>
+        Fetch Routes
+      </VSCodeButton>
     </main>
   );
 }
