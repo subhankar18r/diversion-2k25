@@ -1,12 +1,12 @@
 import { commands, ExtensionContext } from "vscode";
-import { HelloWorldPanel } from "./panels/HelloWorldPanel";
+import { RoutesPanel } from "./panels/RoutesPanel";
 
 export function activate(context: ExtensionContext) {
   // Create the show hello world command
-  const showHelloWorldCommand = commands.registerCommand("hello-world.showHelloWorld", () => {
-    HelloWorldPanel.render(context.extensionUri);
+  const showFlowCommand = commands.registerCommand("modulens.showFlow", () => {
+    RoutesPanel.render(context.extensionUri);
   });
 
   // Add command to the extension context
-  context.subscriptions.push(showHelloWorldCommand);
+  context.subscriptions.push(showFlowCommand);
 }
