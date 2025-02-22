@@ -31,28 +31,33 @@ export class SidebarPanel implements vscode.WebviewViewProvider {
     this._view = panel;
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview): string {
+  private _getHtmlForWebview(webview: vscode.Webview) {
+    const scriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "build","assets", "sidebar.js")
+    );
+    const runtimeScriptUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "build","assets", "sjsx-runtime.js")
+    );
+    const stylesUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "webview-ui", "build", "assets", "jsx-runtime.css")
+    );
+    const nonce = getNonce();
     return `
       <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Modulens Sidebar</title>
-        </head>
-        <body>s
-          <h2>Modulens Explorer</h2>
-          <div id="content">
-            Loading...
-          </div>
-          <script>
-            (function() {
-              const vscode = acquireVsCodeApi();
-              console.log('Webview initialized');
-            }())
-          </script>
-        </body>
-      </html>
-    `;
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello World</title>
+    <script type="module" crossorigin src="${scriptUri}"></script>
+    <link rel="modulepreload" href="${runtimeScriptUri}">
+    <link rel="stylesheet" href="${stylesUri}">
+  </head>
+  <body>
+    <div id="root"></div>
+    
+  </body>
+</html>
+ `;
   }
 }
