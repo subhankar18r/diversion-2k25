@@ -13,7 +13,26 @@
         "command": "modulens.showFlow",
         "title": "Show Flow"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "modulens-sidebar",
+          "title": "Modulens",
+          "icon": "$(list-tree)"
+        }
+      ]
+    },
+    "views": {
+      "modulens-sidebar": [
+        {
+          "id": "modulens-sidebarview",
+          "name": "Routes",
+          "icon": "$(list-tree)",
+          "type": "webview"
+        }
+      ]
+    }
   },
   "scripts": {
     "install:all": "npm install && cd webview-ui && npm install",

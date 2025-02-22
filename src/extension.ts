@@ -1,5 +1,7 @@
 import { commands, ExtensionContext } from "vscode";
 import { RoutesPanel } from "./panels/RoutesPanel";
+import { SidebarPanel } from "./panels/SidebarPanel";
+import * as vscode from "vscode";
 
 export function activate(context: ExtensionContext) {
   // Create the show hello world command
@@ -7,6 +9,17 @@ export function activate(context: ExtensionContext) {
     RoutesPanel.render(context.extensionUri);
   });
 
-  // Add command to the extension context
-  context.subscriptions.push(showFlowCommand);
+  const sidebarProvider = new SidebarPanel(context.extensionUri);
+
+  const sidebarView = vscode.window.registerWebviewViewProvider(
+    "modulens-sidebarview",
+    sidebarProvider,
+    {
+      webviewOptions: {
+        retainContextWhenHidden: true,
+      },
+    }
+  );
+
+  context.subscriptions.push(showFlowCommand, sidebarView);
 }
