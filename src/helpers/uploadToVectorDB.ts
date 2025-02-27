@@ -1,10 +1,11 @@
 import * as fs from 'fs';
 import { SourceFile } from './getAllSourceFiles';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { QdrantClient } from '@qdrant/js-client-rest';
+import {  genAiModelProvider, qdrantClientProvider } from './clientProviders';
+import {v4 as uuidv4} from 'uuid';
 
-const genAI = new GoogleGenerativeAI('AIzaSyBUeElOjAV5ftfm2B0xtf3zJ-sNnE0Sq0w');
-const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+const model = genAiModelProvider;
+const qdrant = qdrantClientProvider;
+const collectionName = uuidv4().replace(/-/g, '').substring(0, 10);
 
 async function getEmbedding(text: string) {
     try {
@@ -17,12 +18,6 @@ async function getEmbedding(text: string) {
     }
 }
 
-const qdrant = new QdrantClient({
-    url: 'https://4e2a7319-58de-40d9-87de-23dbcadba7db.europe-west3-0.gcp.cloud.qdrant.io:6333',
-    apiKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIiwiZXhwIjoxNzQxMTM4ODU2fQ.ydEQIryMqnUuQXZNDVHkPURhp5scv3Y0yZBYCT_RaCE',
-});
-
-const collectionName = 'code-information';
 
 async function initializeQdrant() {
     try {
@@ -79,7 +74,7 @@ async function getChunkedEmbeddings(text: string): Promise<number[]> {
     return finalEmbedding;
 }
 
-export async function uploadToVectorDB(files: SourceFile[]): Promise<void> {
+export async function uploadToVectorDB(files: SourceFile[]): Promise<string> {
     try {
         await initializeQdrant();
 
@@ -134,5 +129,6 @@ export async function uploadToVectorDB(files: SourceFile[]): Promise<void> {
         console.error('Error uploading to vector DB:', error);
         throw error;
     }
+    return collectionName;
 }
 
